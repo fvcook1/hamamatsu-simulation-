@@ -1,0 +1,31 @@
+from PIL import Image
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+
+
+path = 'GRIP/'
+
+def list_files1(directory):
+    files = os.listdir(directory)
+    list =[]
+    for file in files:
+        if file.endswith(".tiff"):
+            list.append(file)
+    return (list)
+
+files = list_files1(path)
+mean_array =[]
+
+for file_number in range(np.size(files)):
+    filename = path + files[file_number]
+    print(filename)
+    img = Image.open(filename)
+    imgArray = np.zeros((img.size[1], img.size[0], img.n_frames), np.uint16)
+    for I in range(img.n_frames):
+        img.seek(I) # Pointing
+        imgArray[:, :, I] = img # copying
+    img.close()
+    mean_array.append(np.mean(imgArray, axis=2))
+
+mean_array = np.array(mean_array)

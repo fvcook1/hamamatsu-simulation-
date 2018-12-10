@@ -21,49 +21,65 @@ def build_shot(camera_size, num_photons):
     s = ss.poisson((num_photons)**(1/2), (camera_size))
     return s
     
-#simulation    
+
+# simulation
 import numpy as np
 import matplotlib.pyplot as plt
-import noise as n
+#import noise as n
 import imageio
 
-#variables
-camera_size = [2048,2048]
+# functions
+# fixed pattern noise
+def build_fpn(camera_size, width):
+    mu = 1
+    f = np.random.normal(mu, width, camera_size)
+    return f
+
+
+# read noise
+def build_read(camera_size):
+    # seed = 10
+    mu = 2
+    # rs = np.random.RandomState(seed)
+    # r = rs.poisson(mu, (camera_size))
+    r = np.random.poisson(mu, (camera_size))
+    return r
+
+
+# shot noise
+def build_shot(camera_size, num_photons):
+    # seed = 10
+    # ss = np.random.RandomState(seed)
+    # s = ss.poisson((num_photons) ** (1 / 2), (camera_size))
+    s = np.random.poisson((num_photons) ** (1
+# variables
+camera_size = [2048, 2048]
 width = 0.1
-gain= 1
-offset=100
-#num_photons= 1000
+gain = 1
+offset = 100
+num_photons = 1000
 
-#define fixed pattern noise
-#generate once for each camera
-fixed_pattern = n.build_fpn(camera_size, width)
+# define fixed pattern noise
+# generate once for each camera
+fixed_pattern = build_fpn(camera_size, width)
 
-for J in np.arange(0,100,10):
-    num_photons = J
-    image= num_photons*np.ones(camera_size)
-#total noise
-#generate 1000 times for each camera and then take the average of those frames
-#make a for loop to make 1000 frames
-read_noise = []
-shot_noise=[]
+for num_photons in np.arange(0, 1000, 100):
+    image = num_photons * np.ones(camera_size)
 
-for I in range(10):
-    
-    read_noise.append(n.build_read(camera_size))
-    shot_noise.append(n.build_shot(camera_size, num_photons))
+# total noise
+# generate 1000 times for each camera and then take the average of those frames
+# make a for loop to make 1000 frames
+    read_noise = []
+    shot_noise = []
 
+    for I in range(20):
+        read_noise.append(build_read(camera_size))
+        shot_noise.append(build_shot(camera_size, num_photons))
 
-print(np.shape(read_noise))
-read_noise = np.asarray(read_noise)
-shot_noise = np.asarray(shot_noise)
-print(np.shape(read_noise))
-
-out = offset+((read_noise+ shot_noise)*fixed_pattern) + (fixed_pattern*image)
-print(np.shape(out))
-
-
-for i in range(0, np.max())
-    filename = "snuggles.tif" % i + 1
-
-out = np.uint16(out)
-imageio.mimwrite('snuggles.tif',out)
+    read_noise = np.asarray(read_noise)
+    shot_noise = np.asarray(shot_noise)
+    out = offset + ((read_noise + shot_noise) * fixed_pattern) + (fixed_pattern * image)
+    out = np.float32(out)
+    file_name = str(num_photons) + '.tiff'
+    print(file_name)
+    imageio.mimwrite(file_name, out

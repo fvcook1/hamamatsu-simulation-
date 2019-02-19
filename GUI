@@ -1,0 +1,181 @@
+from tkinter import *
+import numpy as np
+import matplotlib.pyplot as plt
+#import noise as n
+import imageio
+
+#Initialise application
+class Application(Frame):
+    def info(self): #Create information function (Placeholder Text)
+        print ("Lorem ipsum  dolor sit amet, consectetur adipiscing elit.\
+Suspendisse imperdiet at nulla vitae dapibus.")
+    
+#    def flosim(self): #Create Run function
+#        a = float(self.entry3.get()) #Use x.get() to take inputs from entry widget 
+#        b = float(self.entry4.get()) # and convert them to floats for use in calculation
+#        
+#        Q = np.array(np.arange(0,100,1)) #Placeholder calculation and graph formation
+#        Q1 = Q*a
+#        
+#        R = np.array(np.arange(0,60,0.6))
+#        R1 = Q1*np.exp(b*R)
+#        
+#        plt.plot(Q1,R1)
+#        plt.show()
+#        
+        
+    def flosim(self):
+#    
+##        e1, e2 = int(self.entry2.get()), int(self.entry3.get())
+##        camera_size =  [[0 for x in range(e1)] for y in range(e2)]
+#        
+        num_photons = 1000
+        count =0
+        image = np.zeros(  [int(  self.entry2.get()  ),int(self.entry3.get())], dtype=int  )
+        for num_photons in (np.arange(0, 1000, 100)):
+            image[:,:, count] = num_photons * np.ones([int(self.entry2.get()),int(self.entry3.get())], dtype =int) 
+            count = count + 1           
+#             image = num_photons * np.ones(camera_size)
+#            
+#        
+#        
+#            
+    #fixed pattern noise
+        def build_fpn(self):
+            mu=1
+            cs1 = image
+            width = 0.1
+            f=np.random.normal(mu, width, cs1)
+            return f
+    
+    #read noise
+        def build_read(self):
+            seed = 10
+            mu=2
+            cs2 = image
+            rs = np.random.RandomState(seed)
+            r = rs.poisson(mu, (cs2))
+            return r
+    
+    #shot noise
+        def build_shot(self):
+            seed = 10
+            cs3 = image
+            ss = np.random.RandomState(seed)
+            s = ss.poisson((num_photons)**(1/2), (cs3))
+            return s    
+        
+        # total noise
+    # generate 1000 times for each camera and then take the average of those frames
+    # make a for loop to make 1000 frames
+        read_noise = []
+        shot_noise = []
+    
+        # define fixed pattern noise
+        # generate once for each camera
+        fixed_pattern = build_fpn()
+    
+        for I in range(20):
+            read_noise.append(build_read(image))
+            shot_noise.append(build_shot(image, num_photons))
+    
+        read_noise = np.asarray(read_noise)
+        shot_noise = np.asarray(shot_noise)
+        out = int(self.entry4.get()) + ((read_noise + shot_noise) * fixed_pattern) + (fixed_pattern * image)
+        out = np.float32(out)
+        file_name = str(num_photons) + '.tiff'
+        print(file_name)
+#    #    imageio.mimwrite(file_name, out)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    def createWidgets(self): #Use function to create widgets within app
+        self.QUIT = Button(self) #Button() function self explanatory; creates quit button
+        self.QUIT["text"] = "X" #What button says
+        self.QUIT["fg"]   = "white" #Foregroung colour (i.e. text colour)
+        self.QUIT["bg"]   = "red" #Background colour
+        self.QUIT["width"] = 2 #Size of button
+        self.QUIT["command"] =  self.quit #What the button does; quit is standard function
+
+        self.QUIT.pack({"side": "left"}) #Placement of button; need to move these around
+        
+        
+        
+
+        self.inform = Button(self) #Creates 'info' button
+        self.inform["text"] = "i",
+        self.inform["fg"]  = "white"
+        self.inform["bg"]  = 'blue'
+        self.inform["width"] = 2
+        self.inform["command"] = self.info #Uses info function created earlier
+
+        self.inform.pack({"side": "left"})
+        
+        
+        
+        
+#        self.label1 = Label(self, text="Gain:",font='Calibri 10 bold', width = 7) 
+#        self.label1.pack({'side':'left'}) #Creates and formats entry labels
+#        self.entry1 = Entry(self)
+#        self.entry1.pack({'side':'left'})
+        
+        self.label2 = Label(self, text="Camera Size:",font='Calibri 10 bold', width= 14)
+        self.label2.pack({'side':'left'})
+        
+        self.label3 = Label(self, text="x:",font='Calibri 10 bold', width= 5)
+        self.label3.pack({'side':'left'})
+        
+        self.entry2 = Entry(self)
+        self.entry2["width"] = 6
+        self.entry2.pack({"side":"left"})
+        
+        self.label4 = Label(self, text="y:",font='Calibri 10 bold', width= 5)
+        self.label4.pack({'side':'left'})
+        
+        self.entry3 = Entry(self)
+        self.entry3["width"] = 6
+        self.entry3.pack({"side":"left"})
+        
+        self.label5 = Label(self, text="Offset:",font='Calibri 10 bold', width= 10)
+        self.label5.pack({'side':'left'})
+        
+        self.entry4 = Entry(self)
+        self.entry4["width"] = 10
+        self.entry4.pack({"side":"left"})
+
+        self.tk_setPalette(background='cornflowerblue', foreground='snow') #Sets app colours
+        
+        
+        
+        
+        
+        self.go = Button(self) #Creates Run button
+        self.go["text"] = "Run"
+        self.go["fg"] = "white"
+        self.go["bg"] = "green"
+        self.go["width"] = 5
+        self.go["command"] = self.flosim #Uses earlier 'graph' function
+        
+        self.go.pack({"side":"left"})
+
+
+
+    def __init__(self, master=None): #Initialises the system; don't really get this bit
+        Frame.__init__(self, master)
+        self.pack()
+        self.createWidgets()
+
+
+
+
+root = Tk() #Don't 100% get this bit either but it works
+app = Application(master=root)
+app.mainloop()
+root.destroy()

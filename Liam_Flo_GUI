@@ -1,0 +1,30 @@
+from whole import creating #will create another folder that contains this function
+from tkinter import *
+window = Tk()
+window.title("Create your own SNR and photon transfer curve!!!!!")
+
+#entry boxes
+lbl = Label(window, text="Input Camera specs:")
+lbl.grid(column=0, row=0)
+window.geometry('350x200')
+
+lbl1=Label(window, text="Size:")
+lbl1.grid(column=0, row=1)
+txt1 = Entry(window,width=10)
+txt1.grid(column=1, row=1)
+
+lbl2=Label(window, text="Gain:")
+lbl2.grid(column=0, row=2)
+txt2 = Entry(window,width=10)
+txt2.grid(column=1, row=2)
+
+#creating a button
+def clicked():
+   camera_size = [txt1.get(),txt1.get()]
+   gain= txt2.get()
+   creating(camera_size)
+
+btn = Button(window, text="GO!", command = clicked)
+btn.grid(column=50, row=50)
+
+window.mainloop()

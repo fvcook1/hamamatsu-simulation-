@@ -1,4 +1,4 @@
-from whole import creating #will create another folder that contains this function
+from whole import creating
 from tkinter import *
 window = Tk()
 window.title("Create your own SNR and photon transfer curve!!!!!")
@@ -10,21 +10,84 @@ window.geometry('350x200')
 
 lbl1=Label(window, text="Size:")
 lbl1.grid(column=0, row=1)
-txt1 = Entry(window,width=10)
+txt1 = Entry(window, width =10 )
 txt1.grid(column=1, row=1)
 
 lbl2=Label(window, text="Gain:")
 lbl2.grid(column=0, row=2)
-txt2 = Entry(window,width=10)
+txt2 = Entry(window, width =10 )
 txt2.grid(column=1, row=2)
 
 #creating a button
 def clicked():
-   camera_size = [txt1.get(),txt1.get()]
+   camera_size = int(txt1.get()),int(txt1.get())
    gain= txt2.get()
+
+#   def creating(camera_size):
+    
+   import numpy as np
+   import matplotlib.pyplot as plt
+        #import noise as n
+   import imageio
+        
+        # functions
+        # fixed pattern noise
+   def build_fpn(camera_size, width):
+        mu = 1
+        f = np.random.normal(mu, width, camera_size)
+        return f
+        
+        
+        # read noise
+   def build_read(camera_size):
+        mu = 2
+        r = np.random.poisson(mu, (camera_size))
+        return r
+        
+        
+        # shot noise
+   def build_shot(camera_size, num_photons):
+        s = np.random.poisson((num_photons) ** (1 / 2), (camera_size))
+        return s
+        
+        
+        
+        
+        # variables
+#        camera_size = [2048, 2048]
+   width = 0.1
+#        gain = 1
+   offset = 100
+   num_photons = 1000
+        
+        # define fixed pattern noise
+        # generate once for each camera
+   fixed_pattern = build_fpn(camera_size, width)
+        
+   for num_photons in np.arange(0, 1000, 100):
+        image = num_photons * np.ones(camera_size)
+            
+            # total noise
+            # generate 1000 times for each camera and then take the average of those frames
+            # make a for loop to make 1000 frames
+        read_noise = []
+        shot_noise = []
+            
+        for I in range(20):
+            read_noise.append(build_read(camera_size))
+            shot_noise.append(build_shot(camera_size, num_photons))
+                
+            read_noise = np.asarray(read_noise)
+            shot_noise = np.asarray(shot_noise)
+            out = offset + ((read_noise + shot_noise) * fixed_pattern) + (fixed_pattern * image)
+            out = np.float32(out)
+            file_name = str(num_photons) + '.tiff'
+            print(file_name)
+            imageio.mimwrite(file_name, out)
    creating(camera_size)
 
 btn = Button(window, text="GO!", command = clicked)
 btn.grid(column=50, row=50)
 
 window.mainloop()
+

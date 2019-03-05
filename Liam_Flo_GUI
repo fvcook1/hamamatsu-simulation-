@@ -1,4 +1,4 @@
-from whole import creating
+#from whole import creating
 from tkinter import *
 window = Tk()
 window.title("Create your own SNR and photon transfer curve!!!!!")
@@ -72,22 +72,26 @@ def clicked():
             # make a for loop to make 1000 frames
         read_noise = []
         shot_noise = []
-            
+        out = []
         for I in range(20):
-            read_noise.append(build_read(camera_size))
-            shot_noise.append(build_shot(camera_size, num_photons))
-                
+            print(I)
+            #read_noise.append(build_read(camera_size))
+            #shot_noise.append(build_shot(camera_size, num_photons))
+            read_noise = (build_read(camera_size))
+            shot_noise = (build_shot(camera_size, num_photons))
+
             read_noise = np.asarray(read_noise)
             shot_noise = np.asarray(shot_noise)
-            out = offset + ((read_noise + shot_noise) * fixed_pattern) + (fixed_pattern * image)
-            out = np.float32(out)
+            out_temp = offset + ((read_noise + shot_noise) * fixed_pattern) + (fixed_pattern * image)
+            out_temp  = np.uint16(out_temp)
+            out.append(out_temp)
             file_name = str(num_photons) + '.tiff'
             print(file_name)
-            imageio.mimwrite(file_name, out)
-   creating(camera_size)
+        out = np.asarray(out)
+        imageio.mimwrite(file_name, out)
+   #creating(camera_size)
 
 btn = Button(window, text="GO!", command = clicked)
 btn.grid(column=50, row=50)
 
 window.mainloop()
-

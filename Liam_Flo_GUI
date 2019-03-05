@@ -18,6 +18,16 @@ lbl2.grid(column=0, row=2)
 txt2 = Entry(window, width =10 )
 txt2.grid(column=1, row=2)
 
+lbl3=Label(window, text="Read noise:")
+lbl3.grid(column=0, row=3)
+txt3 = Entry(window, width =10 )
+txt3.grid(column=1, row=3)
+
+lbl4=Label(window, text="FPN:")
+lbl4.grid(column=0, row=4)
+txt4 = Entry(window, width =10 )
+txt4.grid(column=1, row=4)
+
 #creating a button
 def clicked():
    camera_size = int(txt1.get()),int(txt1.get())

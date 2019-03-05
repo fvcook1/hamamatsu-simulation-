@@ -103,5 +103,12 @@ def clicked():
 
 btn = Button(window, text="GO!", command = clicked)
 btn.grid(column=50, row=50)
+import matplotlib.pyplot as plt
+import numpy as np
 
+def sine_graph():
+    z = np.arange(-6.28, 6.28, 0.1)
+    plt.plot(z, np.sin(z))
+    
+sine_graph()
 window.mainloop()

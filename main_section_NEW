@@ -1,0 +1,64 @@
+import numpy as np
+import noise_utils as nu
+
+# load in back ground correction
+
+
+background = np.load('dark_frame.npy')
+print(np.shape(background))
+# read in all the data filename
+
+
+directory = 'New_data'
+files_a = nu.list_files(directory, '.tif')
+
+# define array
+x_start = 512
+y_start = 512
+x_length = 1024
+y_length = 1024
+
+background = background[x_start:x_start+x_length, y_start:y_start+y_length]
+
+final_array_mean = []
+final_array_var = []
+
+for file_name in files_a:
+
+        file_name_full = directory + '/' +file_name
+
+# This line loads the file in to memory
+
+
+        current_data = nu.load_tiff(file_name_full)
+
+#This removes offset
+
+        for I in range(np.size(current_data,axis=2)):
+
+                current_data[:,:,I] = np.float32(current_data[:,:,I]-background)
+                
+
+#  This line cuts out the section of the image we are interested in
+
+                current_data = current_data[x_start:x_start+x_length, y_start:y_start+y_length, :]
+
+                print(np.shape(current_data))
+
+#  reshape the data in to one long array for calculating the mean and the standard deviation
+#    current_data = np.reshape(current_data, (x_length * y_length * np.size(current_data, 2)))
+#    print(np.shape(current_data))
+
+                std_array = np.std(current_data, dtype=np.float64)
+                mean_array = np.mean(current_data)
+                print(np.shape(mean_array))
+
+                final_array_mean = np.append(final_array_mean, mean_array)
+                final_array_var = np.append(final_array_var, std_array)
+
+print(np.shape(final_array_mean))
+
+np.save('Noise_whole_cam_NEW', final_array_var)
+np.save('Mean_whole_cam_NEW', final_array_mean)
+
+               

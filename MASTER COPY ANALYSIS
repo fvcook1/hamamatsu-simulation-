@@ -1,0 +1,90 @@
+#   OFFSET CODE
+
+
+
+
+import numpy as np
+import noise_utils as nu
+
+
+file_name = 'DARK.tif'
+imgArray = nu.load_tiff(file_name)
+mean_data = np.mean(imgArray, 2)
+print(np.shape(mean_data))
+print(np.mean(mean_data))
+np.save('mean_array_andor', mean_data)
+
+
+
+
+# MAIN SECTION ANALYSIS
+
+
+
+
+import noise_utils as nu
+
+# load in back ground correction
+
+
+background = np.load('PLACEHOLDER_ARRAY.npy')
+print(np.shape(background))
+# read in all the data filename
+
+
+directory = 'PLACEHOLDER'
+files_a = nu.list_files(directory, '.tiff')
+
+# define array
+x_start = 512
+y_start = 512
+x_length =512
+y_length =512
+
+#background = background[x_start:x_start+x_length, y_start:y_start+y_length]
+
+final_array_mean = []
+final_array_var = []
+
+for file_name in files_a:
+
+        file_name_full = directory + '/' +file_name
+
+# This line loads the file in to memory
+
+
+        current_data = nu.load_tiff(file_name_full)
+
+# This removes offset
+
+        for I in range(np.size(current_data,axis=2)):
+                current_data[:,:,I] = np.float32(current_data[:,:,I]-background)
+
+
+# This line cuts out the section of the image we are interested in
+
+        current_data_temp = current_data[x_start:x_start+x_length, y_start:y_start+y_length, :]
+
+        print(np.shape(current_data_temp))
+
+#  reshape the data in to one long array for calculating the mean and the standard deviation
+
+     current_data = np.reshape(current_data, (x_length * y_length * np.size(current_data, 2)))
+     print(np.shape(current_data))
+
+        std_array = np.std(np.reshape(current_data,[1,x_length*y_length*100]), dtype=np.float64)
+        mean_array = np.mean(np.reshape(current_data,[1,x_length*y_length*100]), dtype = np.float64)
+        print(np.shape(mean_array))
+
+        final_array_mean = np.append(final_array_mean, mean_array)
+        final_array_var = np.append(final_array_var, std_array)
+
+print(np.shape(final_array_mean))
+
+np.save('Noise_whole_cam_PLACEHOLDER', final_array_var)
+np.save('Mean_whole_cam_PLACEHOLDER', final_array_mean)
+
+
+
+#NB: MAY BE INDENTATION ISSUES IN THE LATTER HALF
+

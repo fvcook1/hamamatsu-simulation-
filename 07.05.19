@@ -1,0 +1,223 @@
+#   OFFSET CODE
+
+
+
+
+import numpy as np
+#import noise_utils as nu
+#
+#
+#file_name = 'DARK.tif'
+#imgArray = nu.load_tiff(file_name)
+#mean_data = np.mean(imgArray, 2)
+#print(np.shape(mean_data))
+#print(np.mean(mean_data))
+#np.save('mean_array_andor', mean_data)
+
+
+
+
+
+#CREATE DIRECTORY FOR FILES
+
+
+
+import os
+os.mkdir('Camera Data 3')
+
+
+
+
+
+
+
+#SIMULATED DATA
+
+
+#from whole import creating
+from tkinter import *
+window = Tk()
+window.title("Create your own SNR and photon transfer curve!!!!!")
+
+#entry boxes
+lbl = Label(window, text="Input Camera specs:")
+lbl.grid(column=0, row=0)
+window.geometry('350x200')
+
+lbl1=Label(window, text="Size:")
+lbl1.grid(column=0, row=1)
+txt1 = Entry(window, width =10 )
+txt1.grid(column=1, row=1)
+
+lbl2=Label(window, text="Gain:")
+lbl2.grid(column=0, row=2)
+txt2 = Entry(window, width =10 )
+txt2.grid(column=1, row=2)
+
+lbl3=Label(window, text="Read noise:")
+lbl3.grid(column=0, row=3)
+txt3 = Entry(window, width =10 )
+txt3.grid(column=1, row=3)
+
+lbl4=Label(window, text="FPN:")
+lbl4.grid(column=0, row=4)
+txt4 = Entry(window, width =10 )
+txt4.grid(column=1, row=4)
+
+#creating a button
+def clicked():
+   camera_size = int(txt1.get()),int(txt1.get())
+   gain= txt2.get()
+
+#   def creating(camera_size):
+    
+   import numpy as np
+   import matplotlib.pyplot as plt
+        #import noise as n
+   import imageio
+        
+        # functions
+        # fixed pattern noise
+   def build_fpn(camera_size, width):
+        mu = 1
+        f = np.random.normal(mu, width, camera_size)
+        return f
+        
+        
+        # read noise
+   def build_read(camera_size):
+        mu = 2
+        r = np.random.poisson(mu, (camera_size))
+        return r
+        
+        
+        # shot noise
+   def build_shot(camera_size, num_photons):
+        s = np.random.poisson((num_photons) ** (1 / 2), (camera_size))
+        return s
+        
+        
+        
+        
+        # variables
+#        camera_size = [2048, 2048]
+   width = 0.1
+#        gain = 1
+   offset = 100
+   num_photons = 1000
+        
+        # define fixed pattern noise
+        # generate once for each camera
+   fixed_pattern = build_fpn(camera_size, width)
+        
+   for num_photons in np.arange(0, 1000, 100):
+        image = num_photons * np.ones(camera_size)
+            
+            # total noise
+            # generate 1000 times for each camera and then take the average of those frames
+            # make a for loop to make 1000 frames
+        read_noise = []
+        shot_noise = []
+        out = []
+        for I in range(20):
+            print(I)
+            #read_noise.append(build_read(camera_size))
+            #shot_noise.append(build_shot(camera_size, num_photons))
+            read_noise = (build_read(camera_size))
+            shot_noise = (build_shot(camera_size, num_photons))
+
+            read_noise = np.asarray(read_noise)
+            shot_noise = np.asarray(shot_noise)
+            out_temp = offset + ((read_noise + shot_noise) * fixed_pattern) + (fixed_pattern * image)
+            out_temp  = np.uint16(out_temp)
+            out.append(out_temp)
+            file_name = str(num_photons) + '.tiff'
+            print(file_name)
+        out = np.asarray(out)
+        imageio.mimwrite('Camera Data\ ' + file_name, out)
+   #creating(camera_size)
+
+btn = Button(window, text="GO!", command = clicked)
+btn.grid(column=50, row=50)
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+
+
+
+
+#
+#
+#
+## MAIN SECTION ANALYSIS
+#
+#
+#
+##
+##import noise_utils as nu
+#
+## load in back ground correction
+#
+#
+##background = np.load('PLACEHOLDER_ARRAY.npy')
+#
+##print(np.shape(background))
+#
+#background = 100
+## read in all the data filename
+#
+#
+#directory = 'Camera Data'
+#files_a = nu.list_files(directory, '.tiff')
+#
+## define array
+#x_start = 1024
+#y_start = 1024
+#
+#x_length =512
+#y_length =512
+#
+##background = background[x_start:x_start+x_length, y_start:y_start+y_length]
+#
+#final_array_mean = []
+#final_array_var = []
+#
+#for file_name in files_a:
+#
+#        file_name_full = directory + '/' +file_name
+#
+## This line loads the file in to memory
+#
+#
+#        current_data = nu.load_tiff(file_name_full)
+#
+## This removes offset
+#
+#        for I in range(np.size(current_data,axis=2)):
+#                current_data[:,:,I] = np.float32(current_data[:,:,I]-background)
+#
+#
+## This line cuts out the section of the image we are interested in
+#
+#        current_data_temp = current_data[x_start:x_start+x_length, y_start:y_start+y_length, :]
+#
+#        print(np.shape(current_data_temp))
+#
+##  reshape the data in to one long array for calculating the mean and the standard deviation
+#
+#        current_data = np.reshape(current_data, (x_length * y_length * np.size(current_data, 2)))
+#        print(np.shape(current_data))
+#
+#        std_array = np.std(np.reshape(current_data,[1,x_length*y_length*100]), dtype=np.float64)
+#        mean_array = np.mean(np.reshape(current_data,[1,x_length*y_length*100]), dtype = np.float64)
+#        print(np.shape(mean_array))
+#
+#        final_array_mean = np.append(final_array_mean, mean_array)
+#        final_array_var = np.append(final_array_var, std_array)
+#
+#print(np.shape(final_array_mean))
+#
+#np.save('Noise_whole_cam_PLACEHOLDER', final_array_var)
+#np.save('Mean_whole_cam_PLACEHOLDER', final_array_mean)
+#

@@ -53,7 +53,7 @@ window.title("Create your own SNR and photon transfer curve!!!!!")
 #entry boxes
 lbl = Label(window, text="Input Camera specs:")
 lbl.grid(column=0, row=0)
-window.geometry('350x200')
+window.geometry('450x250')
 
 lbl1=Label(window, text="Size:")
 lbl1.grid(column=0, row=1)
@@ -151,6 +151,19 @@ def clicked():
 
 btn = Button(window, text="GO!", command = clicked)
 btn.grid(column=50, row=50)
+
+lbl5=Label(window, text="Compare with:")
+lbl5.grid(column=0, row=6)
+
+btn2 = Button(window, text="Andor Zyla 4.2")
+btn2.grid(column=0,row =7)
+
+btn3 = Button(window, text="Hamamatsu ORCA-Fusion")
+btn3.grid(column=1,row =7)
+
+btn4 = Button(window, text="Hamamatsu Flash 4.0")
+btn4.grid(column=2,row =7)
+
 import matplotlib.pyplot as plt
 import numpy as np
 
